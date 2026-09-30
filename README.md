@@ -21,12 +21,16 @@ Installing requires a license key. The key is entered once during install, and t
 ### نصب / Install
 
 ```bash
-bash <(curl -fsSL https://license.hmray.pro/3xfactor/install.sh)
+bash <(curl -fsSL https://raw.githubusercontent.com/neoauroraproject/3xfactor/main/install.sh)
 ```
 
 با اجرای همین دستور یک منو می‌آید: نصب، به‌روزرسانی، تغییر لایسنس، تغییر رمز، حذف، وضعیت.
 
 The same command opens a menu: install, update, change license, password, uninstall, status.
+
+وضعیت لایسنس، زمان باقی‌مانده و تاریخ انقضا در بخش «لایسنس» پنل دیده می‌شود و با دکمهٔ «بررسی الان» می‌شود تمدید را فوراً دریافت کرد.
+
+The panel's License section shows the status, time left and expiry date. The "Check now" button picks up a renewal right away.
 
 ضریب هر اینباند در فایلی کنار Xray ذخیره می‌شود. بعد از نصب پچ، همان فایل حدود هر دو ثانیه خوانده می‌شود و روی شمارندهٔ مصرف همان اینباند اعمال می‌گردد. ضریب `1` یعنی بدون تغییر. وقتی لایسنس تمام شود، همهٔ ضریب‌ها به `1` برمی‌گردند.
 
