@@ -7,6 +7,8 @@ set -euo pipefail
 
 RELEASES="https://github.com/neoauroraproject/3xfactor/releases/latest/download"
 INSTALLED="/usr/local/3xfactor/3xfactor"
+CONFIG="/usr/local/3xfactor/config.json"
+LICENSE_FILE="/etc/3xfactor/license.bin"
 
 if [ "$(id -u)" -ne 0 ]; then
   echo "Run this installer as root." >&2
@@ -120,16 +122,32 @@ for a in "$@"; do
   [ "$a" = "--yes" ] && NONINTERACTIVE=1
 done
 
+update_from_release() {
+  BIN="$(download_release)"
+  trap 'rm -f "$BIN"' EXIT
+  "$BIN" update --from "$BIN"
+}
+
 case "$CMD" in
   install)
-    read_key
+    if [ -f "$CONFIG" ]; then
+      echo "3xFactor is already installed. Updating it to the latest release; password, port and license stay the same." >&2
+      update_from_release
+      exit 0
+    fi
+    if [ -n "${LICENSE_KEY:-}" ] || [ ! -f "$LICENSE_FILE" ]; then
+      read_key
+      export LICENSE_KEY="$KEY"
+    else
+      echo "A license is already saved on this server; it will be reused." >&2
+    fi
     BIN="$(download_release)"
     trap 'rm -f "$BIN"' EXIT
-    LICENSE_KEY="$KEY" "$BIN" install "$@" <"$TTY"
+    "$BIN" install "$@" <"$TTY"
     ;;
   update)
     require_installed
-    exec "$INSTALLED" update "$@"
+    update_from_release
     ;;
   license)
     require_installed
