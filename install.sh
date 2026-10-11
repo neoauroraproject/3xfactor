@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # 3xFactor
 #   bash <(curl -fsSL https://raw.githubusercontent.com/neoauroraproject/3xfactor/main/install.sh)
-#   bash <(curl -fsSL https://raw.githubusercontent.com/neoauroraproject/3xfactor/main/install.sh) install | update | license | password | uninstall | status
+#   bash <(curl -fsSL https://raw.githubusercontent.com/neoauroraproject/3xfactor/main/install.sh) install | update | license | password | patch | uninstall | status
 #   LICENSE_KEY=HM-XXXX-XXXX-XXXX bash <(curl -fsSL https://raw.githubusercontent.com/neoauroraproject/3xfactor/main/install.sh) install --yes
 set -euo pipefail
 
@@ -83,7 +83,7 @@ require_installed() {
 
 if [ "$#" -eq 0 ]; then
   if [ ! -r /dev/tty ]; then
-    echo "Run: install | update | license | password | uninstall | status" >&2
+    echo "Run: install | update | license | password | patch | uninstall | status" >&2
     exit 1
   fi
   cat >&2 <<'EOF'
@@ -94,8 +94,10 @@ if [ "$#" -eq 0 ]; then
   2) Update
   3) Change license
   4) Change password
-  5) Uninstall
-  6) Status
+  5) Install Xray patch
+  6) Remove Xray patch
+  7) Uninstall
+  8) Status
   0) Exit
 
 EOF
@@ -106,8 +108,10 @@ EOF
       2|update) CMD="update"; break ;;
       3|license) CMD="license"; break ;;
       4|password) CMD="password"; break ;;
-      5|uninstall|remove) CMD="uninstall"; break ;;
-      6|status) CMD="status"; break ;;
+      5|patch|patch-install) CMD="patch"; break ;;
+      6|patch-remove|unpatch) CMD="unpatch"; break ;;
+      7|uninstall|remove) CMD="uninstall"; break ;;
+      8|status) CMD="status"; break ;;
       0|q|exit) exit 0 ;;
       *) echo "Enter a number from the menu." >&2 ;;
     esac
@@ -157,12 +161,22 @@ case "$CMD" in
     require_installed
     exec "$INSTALLED" "$CMD" "$@" <"$TTY"
     ;;
+  patch|patch-install)
+    require_installed
+    echo "Installing the Xray patch. Live logs appear below..." >&2
+    exec "$INSTALLED" patch install "$@"
+    ;;
+  unpatch|patch-remove|patch-uninstall)
+    require_installed
+    echo "Removing the Xray patch..." >&2
+    exec "$INSTALLED" patch uninstall "$@"
+    ;;
   status)
     require_installed
     exec "$INSTALLED" status
     ;;
   *)
-    echo "Unknown command: $CMD (install | update | license | password | uninstall | status)" >&2
+    echo "Unknown command: $CMD (install | update | license | password | patch | uninstall | status)" >&2
     exit 1
     ;;
 esac
